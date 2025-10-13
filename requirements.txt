@@ -1,0 +1,6 @@
+Flask==3.0.3
+werkzeug==3.0.3
+locust==2.31.4
+bcrypt==4.0.1
+flask-WTF==1.0.1
+pytest==7.0.1

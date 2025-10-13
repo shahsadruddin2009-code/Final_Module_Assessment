@@ -1,0 +1,9 @@
+[bandit]
+# Bandit configuration file  
+# This excludes assert_used (B101) warnings for test files
+
+# Exclude directories
+exclude_dirs = __pycache__, .git, .vscode, node_modules
+
+# Skip B101 (assert_used) for all files since assertions are needed for tests
+skip = B101
