@@ -1972,6 +1972,80 @@ def test_responsive_order_completion_and_confirmation():
     # Verify that cart is now empty after checkout (should redirect)
     response = client.get("/checkout", headers=headers)
     assert response.status_code == 302  # Should redirect due to empty cart after successful checkout
+def test_security_against_data_user_injection():
+    """
+    Test that user input is sanitized to prevent injection attacks.
+
+    Validates:
+    - Input fields do not accept malicious scripts or SQL commands
+    """
+    client = app.test_client()
+    headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)"}
+    response = client.get("/", headers=headers)
+    assert response.status_code == 200
+
+    # Attempt to add a book with a script tag in the title
+    malicious_title = "<script>alert('Hacked!');</script>"
+    response = client.post('/add-to-cart', headers=headers, data={
+        'title': malicious_title,
+        'quantity': 1
+    })
+    assert response.status_code == 302  # Bad request or unprocessable entity
+    
+    # Attempt to register with malicious script in email
+    malicious_email = "<script>alert('Hacked!');</script>"
+    response = client.post('/register', headers=headers, data={
+        'username': 'testuser',
+        'email': malicious_email,
+        'password': 'testpass'
+    })
+    # Check that the application handles malicious input properly
+    assert response.status_code == 200  # Application processes request but handles it safely
+    assert b"<script>" not in response.data  # Malicious script is sanitized/removed
+    assert b"Invalid" in response.data or b"error" in response.data  # Error message shown
+    print("User input was properly sanitized.")
+
+def test_security_password_hashing():
+    """
+    Test that user passwords are stored as hashes, not plain text.
+
+    Validates:
+    - Passwords are hashed using a secure algorithm
+    - Hashed passwords cannot be reversed to plain text
+    """
+    password = "SecurePass123!"
+    user = User(email="test@example.com", password=password)
+    
+    # Verify that the password is hashed
+    assert user.password != password  # Password should be hashed
+    assert user.check_password(password)  # Check that the hashed password is valid 
+    assert not user.check_password("WrongPass")  # Invalid password check
+    print("Password hashing is secure and verified.")
+def test_security_againts_sql_injection(monkeypatch):
+    """
+    Test that SQL injection attempts are mitigated.
+
+    Validates:
+    - Input fields do not accept SQL commands
+    """
+    client = app.test_client()
+    headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)"}
+    
+    # Attempt to register with SQL injection in email
+    sql_injection_email = "<script>alert('Hacked!');</script>"
+    sql_injection_password = "password'); DROP TABLE users; --"
+    response = client.post('/register', headers=headers, data={
+        'username': 'testuser',
+        'email': sql_injection_email,
+        'password': sql_injection_password
+    })
+    # Check that the application handles SQL injection properly
+    assert response.status_code == 200  # Application processes request but handles it safely
+    assert b"<script>" not in response.data  # Malicious script is sanitized/removed
+    assert b"DROP TABLE" not in response.data  # SQL injection attempt is sanitized
+    assert b"Invalid" in response.data or b"error" in response.data  # Error message shown
+    print("SQL injection attempt was properly mitigated and further processing was halted.")
+    return
 
 if __name__ == "__main__":
     os.system("cls")  # Clear console on Windows

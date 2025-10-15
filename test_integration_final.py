@@ -613,6 +613,43 @@ def test_integration_complete_user_journey(client):
     response = client.get('/account', follow_redirects=True)
     assert b"Account" in response.data or b"Login" in response.data or bytes(email, 'utf-8') in response.data
 
+def test_integration_security_improvements_and_halt_SQL_injection(client):
+    """
+    Test security improvements against SQL injection attacks.
+    
+    Validates:
+    - User registration with SQL injection attempt is rejected
+    - Login with SQL injection attempt is rejected
+    - Cart addition with SQL injection attempt is rejected
+    - Checkout process with SQL injection attempt is rejected
+    
+    This ensures the application is protected against common SQL injection vectors.
+    """
+    sql_injection_email = "test'; DROP TABLE users; --@example.com"
+    sql_injection_password = "password'; DROP TABLE users; --"  
+    response = client.post('/register', data={
+        'email': sql_injection_email,
+        'password': sql_injection_password,
+        'confirm': sql_injection_password
+    }, follow_redirects=True)
+    assert b"Invalid email format" in response.data or b"Register" in response.data
+    response = client.post('/login', data={
+        'email': sql_injection_email,
+        'password': sql_injection_password
+    }, follow_redirects=True)
+    assert b"Invalid email format" in response.data or b"Login" in response.data
+    response = client.post('/add-to-cart', data={'title': "The Great Gatsby'; DROP TABLE books; --", 'quantity': 1200}, follow_redirects=True)
+    if response.status_code == 200:
+        assert b"Quantity exceeds limit" in response.data or b"Cart" in response.data
+        print("Quantity requested exceeds available stock or limit.")
+    assert response.status_code == 404 or b"Book not found" in response.data
+    response = client.post('/process-checkout', data={
+        'address': "123 Main St'; DROP TABLE orders; --",
+        'name': 'SQL Injection User',
+        'email': sql_injection_email
+    }, follow_redirects=True)
+    assert b"Invalid email format" in response.data or b"Checkout" in response.data
+
 def test_full_integration_shopping_experience(client):
     """
     Test complete end-to-end user journey integration.

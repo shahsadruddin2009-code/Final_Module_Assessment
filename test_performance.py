@@ -554,24 +554,26 @@ def test_user_reset_successful_attempt_after_multiple_failed_logins():
         """Helper function to test user reset logic performance"""
         # Use the pre-created user and modify its attributes
         test_user.failed_login_attempts = 5  # Simulate multiple failed attempts to lock account
-        test_user.successful_login_attempts = 3  # Simulate some successful attempts
+        test_user.unsuccessful_login_attempts = 3  # Simulate some unsuccessful attempts
         test_user.successful_login = False  # Simulate last login was unsuccessful after 3 attempts
         test_user.locked = True  # Simulate locked account
         test_user.reset_successful_login_attempts = 0
         
         # Validate that account is still locked
         assert test_user.locked is True
-        assert test_user.failed_login_attempts == 5      
-        
+        assert test_user.failed_login_attempts == 5
+        assert test_user.unsuccessful_login_attempts == 3
+        assert test_user.reset_successful_login_attempts == 0
+
         # Reset successful login attempts
         test_user.successful_login = True  # Simulate a successful login
         test_user.reset_successful_login_attempts += 1
         
         if test_user.reset_successful_login_attempts >= 3 and test_user.successful_login is True:
-            assert test_user.locked is True
+            assert test_user.locked is False
             test_user.failed_login_attempts = 0
             # Validate that successful attempts are reset
-            assert test_user.successful_login_attempts == 0
+            assert test_user.unsuccessful_login_attempts == 0
             print("User reset successful login attempts after multiple failed logins.")
         
         return test_user
@@ -603,6 +605,24 @@ def test_responsiveness_desktop_no_error_journey():
     # Profile and time the desktop responsiveness test
     profile_function(desktop_journey)
     time_function(desktop_journey)
+
+def test_security_improvements_SQL_injection_performance():
+    """
+    Test performance of security improvements against SQL injection.
+    """
+    print("\n=== SECURITY IMPROVEMENTS AGAINST SQL INJECTION PERFORMANCE TEST ===")
+    
+    # Create Flask test client for the security test
+    with app.test_client() as test_client:
+        def security_test():
+            """Execute the SQL injection security test for performance testing"""
+            return test_integration_final.test_integration_security_improvements_and_halt_SQL_injection(test_client)
+        
+        # Profile and time the security test
+        profile_function(security_test)
+        time_function(security_test)
+
+    
 def run_performance_tests():
     """
     Run comprehensive performance testing suite.
@@ -639,6 +659,7 @@ def run_performance_tests():
     test_user_authentication_performance()
     test_user_reset_successful_attempt_after_multiple_failed_logins()
     test_integration_final.test_user_responsiveness_desktop_no_error(client)
+    test_security_improvements_SQL_injection_performance()
     
     # Print completion message with formatting
     print("\n" + "=" * 50)
