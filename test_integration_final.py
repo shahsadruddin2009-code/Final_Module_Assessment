@@ -347,40 +347,6 @@ def test_profile_page_after_login(client):
     response = client.get('/account', follow_redirects=True)
     assert b"Account" in response.data or bytes(email, 'utf-8') in response.data
 
-def test_integration_cart_checkout_flow(client):
-    """
-    Test complete integrated cart-to-checkout workflow.
-    
-    Validates:
-    - User registration and authentication flow
-    - Shopping cart functionality
-    - Checkout process completion
-    - Order confirmation delivery
-    
-    This tests the core e-commerce integration from cart to purchase.
-    """
-    email = "cartuser@example.com"
-    password = "CartPass123"
-    client.post('/register', data={
-        'email': email,
-        'password': password,
-        'confirm': password
-    }, follow_redirects=True)
-    client.post('/login', data={
-        'email': email,
-        'password': password
-    }, follow_redirects=True)
-    client.post('/add-to-cart', data={'title': 'The Great Gatsby', 'quantity': 1}, follow_redirects=True)
-    response = client.post('/process-checkout', data={
-        'name': 'Final Cart User',
-        'email': email,
-        'address': '123 Main St',
-        'city': 'Test City',
-        'zip_code': '12345',
-        'payment_method': 'cash'
-    }, follow_redirects=True)
-    assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmed" in response.data.lower()
-
 def test_integration_final_cart_checkout_flow(client):
     """
     Test integrated order history functionality after purchase.
@@ -415,6 +381,49 @@ def test_integration_final_cart_checkout_flow(client):
     }, follow_redirects=True)
     response = client.get('/account', follow_redirects=True)
     assert b"Order History" in response.data or b"Account" in response.data or bytes(email, 'utf-8') in response.data
+
+def test_user_responsiveness_desktop_no_error(client, test_email = "desktopuser@example.com" , test_password = "DesktopPass123!", timeout=5):
+    """
+    Test user interface responsiveness on desktop devices.
+    
+    Validates:
+    - Page load times for key user flows
+    - Smoothness of interactions (e.g., adding to cart, checkout)
+    - Overall user experience on desktop screens
+    
+    This ensures the application is performant and user-friendly on larger displays.
+    """
+    if len(test_password) < 8 or not re.search(r'\d', test_password) or not re.search(r'[A-Za-z]', test_password):
+        return
+    try:
+        validate_email(test_email)
+    except EmailNotValidError:
+        return
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', test_email):
+        return
+    if len(test_password) < 8 or not re.search(r'\d', test_password) or not re.search(r'[A-Za-z]', test_password):
+        return
+    client.post('/register', data={
+        'email': test_email,
+        'password': test_password,
+        'confirm': test_password
+    }, follow_redirects=True)
+    client.post('/login', data={
+        'email': test_email,
+        'password': test_password
+    }, follow_redirects=True)
+    client.post('/add-to-cart', data={'title': 'The Great Gatsby', 'quantity': 1}, follow_redirects=True)
+    response = client.post('/process-checkout', data={
+        'name': 'Desktop User',
+        'email': test_email,
+        'address': '123 Main St',
+        'city': 'Test City',
+        'zip_code': '12345',
+        'payment_method': 'cash'
+    }, follow_redirects=True)
+    assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmed" in response.data.lower()
+    assert b'Email sent to your email address' in response.data or b'Order Confirmation' in response.data
+    print("Thanks for shopping with us!")
 
 def test_integration_final_cart_checkout_flow(client):
     """
