@@ -694,7 +694,7 @@ def test_full_checkout_process():
         assert hasattr(order, "items") and isinstance(order.items, dict)
         assert hasattr(order, "total_amount") and order.total_amount >= 0
 
-def test_order_confirmation_contains_order_details(order):
+def test_order_confirmation_contains_order_details():
     """
     Test that order confirmation includes all necessary order details.
     
@@ -704,15 +704,20 @@ def test_order_confirmation_contains_order_details(order):
     
     This ensures customers receive correct order information post-checkout.
     """
-    assert hasattr(order, "order_id")
-    assert hasattr(order, "user_email")
-    assert hasattr(order, "items")
-    assert hasattr(order, "total_amount")
-    assert order.order_id is not None
-    assert order.user_email is not None
-    assert isinstance(order.items, dict)
-    assert order.total_amount >= 0
-    return True
+    test_cart = Cart()
+    user = User(email="orderdetails@example.com", password="detailspass")
+    if BOOKS:
+        test_cart.add_book(BOOKS[0], 1)
+        order = Order("test133", user.email, test_cart.items, {}, {}, test_cart.get_total_price())
+        
+        assert hasattr(order, "order_id")
+        assert hasattr(order, "user_email")
+        assert hasattr(order, "items")
+        assert hasattr(order, "total_amount")
+        assert order.order_id is not None
+        assert order.user_email is not None
+        assert isinstance(order.items, dict)
+        assert order.total_amount >= 0
 # Tests for payment successful transaction:
 def test_payment_successful_transaction():
     """
