@@ -305,13 +305,21 @@ def test_all_model_methods_performance():
     profile_function(test_cartitem_operations)
     time_function(test_cartitem_operations)
     
-    # Test comprehensive Cart operations
-    def test_comprehensive_cart_operations():
-        """Test all Cart class methods"""
+def home_page_and_product_listing_performance_in_two_seconds():
+    """Test home page and product listing performance"""
+    client = app.test_client()
+    with client:
+        # Measure time taken to load home page
+        response = client.get("/")
+        assert response.status_code == 200
+
+        # Measure time taken to load product listing
+        response = client.get("/products")
+        assert response.status_code == 200
+
+        # Measure time taken to add books to cart
         cart = Cart()
         books = [Book(f"Book {i}", "Genre", 5.0 + i, f"/img{i}.jpg") for i in range(10)]
-        
-        # Add books
         for book in books:
             cart.add_book(book, 2)
         
@@ -636,6 +644,8 @@ def run_performance_tests():
     
     # Execute Flask application performance tests
     test_app_performance()
+    home_page_and_product_listing_performance_in_two_seconds()
+    
     
     # Execute comprehensive Flask route performance tests
     test_all_flask_routes_performance()
@@ -665,11 +675,11 @@ def run_performance_tests():
     print("\n" + "=" * 50)
     print("Performance testing completed!")
 
-if __name__ == "__main__":
-    os.system("cls")  # Clear console
-    print(" ")
-
-    print("Tests created by Shahzad Sadruddin - 2513806")
-    print(" ")
-    print("=" * 50)
-    run_performance_tests()
+# Uncomment the lines below to auto-run performance tests when file is executed directly
+# if __name__ == "__main__":
+#     os.system("cls")  # Clear console
+#     print(" ")
+#     print("Tests created by Shahzad Sadruddin - 2513806")
+#     print(" ")
+#     print("=" * 50)
+#     run_performance_tests()

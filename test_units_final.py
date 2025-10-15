@@ -907,7 +907,7 @@ def test_payment_network_error():
             process_payment()
 
 
-def test_order_confirmation_email_sent(monkeypatch):
+def test_order_confirmation_email_sent():
     """
     Test that order confirmation triggers email sending.
 
@@ -1620,7 +1620,7 @@ def test_user_last_login_timestamp():
     assert isinstance(user.last_login, datetime.datetime)
     assert user.last_login == now
 
-def test_user_cannot_register_with_existing_email(monkeypatch):
+def test_user_cannot_register_with_existing_email():
     """
     Test that registering with an existing email is not allowed.
 
@@ -1655,7 +1655,7 @@ def test_invalid_user_login_attempts():
 
     # --- Responsive Design Tests (UI/UX) ---
 
-def test_responsive_layout_mobile(monkeypatch):
+def test_responsive_layout_mobile():
     """
     Test that the main page layout adapts for mobile screen width.
 
@@ -1670,7 +1670,7 @@ def test_responsive_layout_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"<!DOCTYPE html>" in response.data
 
-def test_responsive_layout_tablet(monkeypatch):
+def test_responsive_layout_tablet():
     """
     Test that the layout adapts for tablet screen width.
 
@@ -1684,7 +1684,7 @@ def test_responsive_layout_tablet(monkeypatch):
     assert response.status_code == 200
     assert b"viewport" in response.data  # Check for responsive viewport meta tag
 
-def test_responsive_layout_desktop(monkeypatch):
+def test_responsive_layout_desktop():
     """
     Test that the layout adapts for desktop screen width.
 
@@ -1697,7 +1697,7 @@ def test_responsive_layout_desktop(monkeypatch):
     # Check for desktop-specific classes or layout hints
     assert b"desktop" in response.data or b"container" in response.data
 
-def test_responsive_images_have_srcset(monkeypatch):
+def test_responsive_images_have_srcset():
     """
     Test that images use srcset for responsive loading.
 
@@ -1709,7 +1709,7 @@ def test_responsive_images_have_srcset(monkeypatch):
     # Check that images are present in the page
     assert b"img" in response.data or b"image" in response.data
 
-def test_responsive_font_scaling(monkeypatch):
+def test_responsive_font_scaling():
     """
     Test that font sizes scale for accessibility.
 
@@ -1721,7 +1721,7 @@ def test_responsive_font_scaling(monkeypatch):
     # Check for rem/em or media query in CSS
     assert b"rem" in response.data or b"em" in response.data or b"@media" in response.data
 
-def test_responsive_cart_drawer(monkeypatch):
+def test_responsive_cart_drawer():
     """
     Test that the cart is accessible as a drawer or modal on mobile.
 
@@ -1735,7 +1735,7 @@ def test_responsive_cart_drawer(monkeypatch):
     assert response.status_code == 200
     assert b"cart" in response.data.lower()
 
-def test_responsive_checkout_buttons(monkeypatch):
+def test_responsive_checkout_buttons():
     """
     Test that checkout buttons are large and touch-friendly on mobile.
 
@@ -1748,7 +1748,33 @@ def test_responsive_checkout_buttons(monkeypatch):
     # Check that checkout redirects (requires login)
     assert response.status_code == 302  # Redirect to login
 
-def test_responsive_navbar_collapses_on_mobile(monkeypatch):
+def test_responsive_checkout_forms_mobile_friendly():
+    """
+    Test that checkout forms are mobile-friendly (e.g., large inputs, stacked layout).
+
+    Validates:
+    - Form inputs have large/touch-friendly classes or styles
+    - Layout is stacked for mobile
+    """
+    client = app.test_client()
+    headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3)"}
+    response = client.get("/checkout", headers=headers)
+    # Check that checkout redirects (requires login)
+    assert response.status_code == 302  # Redirect to login
+def test_responsive_navbar_collapses_on_mobile():
+    """
+    Test that the navigation bar collapses into a hamburger menu on mobile devices.
+
+    Validates:
+    - Form inputs have large/touch-friendly classes or styles
+    - Layout is stacked for mobile
+    """
+    client = app.test_client()
+    headers = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3)"}
+    response = client.get("/checkout", headers=headers)
+    # Check that checkout redirects (requires login)
+    assert response.status_code == 302  # Redirect to login
+def test_responsive_navbar_collapses_on_mobile():
     """
     Test that the navigation bar collapses into a hamburger menu on mobile devices.
 
@@ -1763,7 +1789,7 @@ def test_responsive_navbar_collapses_on_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"nav" in response.data.lower() or b"menu" in response.data.lower()
 
-def test_responsive_hide_sidebar_on_mobile(monkeypatch):
+def test_responsive_hide_sidebar_on_mobile():
     """
     Test that sidebar is hidden or collapsible on mobile devices.
 
@@ -1777,7 +1803,7 @@ def test_responsive_hide_sidebar_on_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"html" in response.data
 
-def test_responsive_footer_sticky_on_mobile(monkeypatch):
+def test_responsive_footer_sticky_on_mobile():
     """
     Test that the footer is sticky or appropriately positioned on mobile devices.
 
@@ -1791,7 +1817,7 @@ def test_responsive_footer_sticky_on_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"body" in response.data
 
-def test_responsive_grid_switches_to_single_column_on_mobile(monkeypatch):
+def test_responsive_grid_switches_to_single_column_on_mobile():
     """
     Test that product grid switches to single column layout on mobile.
 
@@ -1805,7 +1831,7 @@ def test_responsive_grid_switches_to_single_column_on_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"html" in response.data
 
-def test_responsive_touch_targets_large_enough(monkeypatch):
+def test_responsive_touch_targets_large_enough():
     """
     Test that touch targets (buttons/links) are large enough on mobile.
 
@@ -1819,7 +1845,7 @@ def test_responsive_touch_targets_large_enough(monkeypatch):
     assert response.status_code == 200
     assert b"button" in response.data.lower() or b"btn" in response.data
 
-def test_responsive_search_bar_expands_on_focus(monkeypatch):
+def test_responsive_search_bar_expands_on_focus():
     """
     Test that the search bar expands or becomes prominent on mobile when focused.
 
@@ -1833,7 +1859,7 @@ def test_responsive_search_bar_expands_on_focus(monkeypatch):
     assert response.status_code == 200
     assert b"search" in response.data.lower() or b"input" in response.data
 
-def test_responsive_hide_non_essential_elements_on_mobile(monkeypatch):
+def test_responsive_hide_non_essential_elements_on_mobile():
     """
     Test that non-essential UI elements are hidden on mobile for clarity.
 
@@ -1847,7 +1873,7 @@ def test_responsive_hide_non_essential_elements_on_mobile(monkeypatch):
     assert response.status_code == 200
     assert b"html" in response.data
 
-def test_responsive_accessibility_labels_present(monkeypatch):
+def test_responsive_accessibility_labels_present():
     """
     Test that responsive elements have appropriate accessibility labels.
 
@@ -1860,7 +1886,7 @@ def test_responsive_accessibility_labels_present(monkeypatch):
     assert response.status_code == 200
     assert b"lang=" in response.data  # Check for language attribute
 
-def test_responsive_skip_to_content_link(monkeypatch):
+def test_responsive_skip_to_content_link():
     """
     Test that a 'skip to content' link is present for accessibility.
 
@@ -1873,7 +1899,7 @@ def test_responsive_skip_to_content_link(monkeypatch):
     assert response.status_code == 200
     assert b"<!DOCTYPE html>" in response.data
 
-def test_responsive_cart_icon_badge(monkeypatch):
+def test_responsive_cart_icon_badge():
     """
     Test that the cart icon displays a badge with item count on all screen sizes.
 
@@ -1972,6 +1998,29 @@ def test_responsive_order_completion_and_confirmation():
     # Verify that cart is now empty after checkout (should redirect)
     response = client.get("/checkout", headers=headers)
     assert response.status_code == 302  # Should redirect due to empty cart after successful checkout
+
+def test_security_user_data_encryption_for_protection():
+    """
+    Test that sensitive user data is encrypted for protection.
+
+    Validates:
+    - Sensitive fields (e.g., password) are not stored in plain text
+    - Password hashing and verification functions work correctly
+    """
+    password = "SensitivePass123!"
+    user = User(email="test@example.com", password=password)
+    
+    # Verify that the password is hashed (not stored in plain text)
+    assert user.password != password  # Password should be hashed, not plain text
+    assert len(user.password) > len(password)  # Hashed password should be longer
+    assert '$' in user.password or 'scrypt' in user.password  # Should contain hash indicators
+    
+    # Verify that password verification works correctly
+    assert user.check_password(password)  # Correct password should validate
+    assert not user.check_password("WrongPassword123!")  # Wrong password should fail
+    
+    print("User data encryption is secure and verified.")
+
 def test_security_against_data_user_injection():
     """
     Test that user input is sanitized to prevent injection attacks.
@@ -2021,7 +2070,8 @@ def test_security_password_hashing():
     assert user.check_password(password)  # Check that the hashed password is valid 
     assert not user.check_password("WrongPass")  # Invalid password check
     print("Password hashing is secure and verified.")
-def test_security_againts_sql_injection(monkeypatch):
+
+def test_security_against_sql_injection():
     """
     Test that SQL injection attempts are mitigated.
 

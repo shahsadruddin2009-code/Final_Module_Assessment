@@ -306,10 +306,10 @@ def register():
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
             flash('Please enter a valid email address', 'error')
             return render_template('register.html')
-        
-        # Validate password strength
-        if len(password) < 8 or not re.search(r'[A-Za-z]', password) or not re.search(r'\d', password):
-            flash('Password must be at least 8 characters long and contain both letters and numbers', 'error')
+
+        # Validate password strength includes special characters, letters, and numbers one uppercase and one lowercase
+        if len(password) < 8 or not re.search(r'[A-Za-z]', password) or not re.search(r'\d', password) or not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            flash('Password must be at least 8 characters long and contain both letters and numbers and special characters', 'error')
             return render_template('register.html')
         
         if email in users:
