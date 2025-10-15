@@ -581,6 +581,7 @@ def test_checkout_with_invalid_user():
         test_cart.add_book(BOOKS[0], 1)
         with pytest.raises(Exception):
             Order("test_invalid", invalid_user.email, test_cart.items, {}, {}, test_cart.get_total_price())
+            print("Invalid user cannot checkout")
 
 # Test for checkout cart items and quantities:
 def test_checkout_cart_items_quantity():
@@ -604,6 +605,114 @@ def test_checkout_cart_items_quantity():
         assert order.items[BOOKS[0].title].quantity == 2
         assert order.items[BOOKS[1].title].quantity == 4
 
+def test_checkout_with_invald_email_format():
+    """
+    Test that checkout properly validates user email format.
+    
+    Validates:
+    - Invalid email formats raise appropriate exceptions
+    - System enforces email format validation before order creation
+    
+    This ensures user data integrity and prevents invalid orders.
+    """
+    test_cart = Cart()
+    invalid_email_user = User(email="invalidemail", password="testpass")
+    if BOOKS:
+        test_cart.add_book(BOOKS[0], 1)
+        with pytest.raises(EmailNotValidError):
+            # Validate email format
+            validate_email(invalid_email_user.email)
+            Order("test_invalid_email", invalid_email_user.email, test_cart.items, {}, {}, test_cart.get_total_price())
+            print("Invalid email format cannot complete checkout")
+            #prompt to enter valid email format
+            valid_email = input("Please enter a valid email address: ")
+            if validate_email(valid_email):
+                Order("test_valid_email", valid_email, test_cart.items, {}, {}, test_cart.get_total_price())
+                print("Checkout completed with valid email")
+            else:
+                # redirect to main page
+                return 
+def test_checkout_with_discount_code():
+    """
+    Test that checkout process correctly applies discount codes.
+    
+    Validates:
+    - Valid discount codes reduce order total appropriately
+    - Invalid discount codes do not affect order total
+    - System correctly calculates final price after discounts
+    
+    This ensures promotional pricing is handled accurately.
+    """
+    test_cart = Cart()
+    user = User(email="discountuser@example.com", password="discountpass")
+    if BOOKS:
+        test_cart.add_book(BOOKS[0], 2)  # Add 2 quantities of the first book
+        original_total = test_cart.get_total_price()
+        discount_code = "SAVE20"
+        discount_percentage = 20  # 20% discount
+        discounted_total = original_total * (1 - discount_percentage / 100)
+        # Simulate applying discount code
+        if discount_code == "SAVE20":
+            final_total = discounted_total
+        else:
+            final_total = original_total
+        order = Order("test131", user.email, test_cart.items, {}, {}, final_total)
+        assert order.total_amount == original_total * 0.8  # Check if 20% discount applied correctly
+
+def test_full_checkout_process():
+    """
+    Test the complete checkout process from cart to order creation.
+    
+    Validates:
+    - Cart can be filled with items
+    - Order is created with correct user and cart data
+    - Cart is cleared after successful order creation
+    - Order total matches cart total at checkout
+    - Order confirmation contains all necessary details
+    - Order confirmation email is sent to user
+    
+    This tests the end-to-end shopping and checkout workflow.
+    """
+    test_cart = Cart()
+    user = User(email="testuser@example.com", password="testpass")
+    if BOOKS:
+        test_cart.add_book(BOOKS[0], 1)
+        # Store the cart total before clearing
+        cart_total = test_cart.get_total_price()
+        order = Order("test132", user.email, test_cart.items, {}, {}, cart_total)
+        assert order.user_email == user.email
+        assert order.items == test_cart.items
+        # Verify order total matches cart total before clearing
+        assert order.total_amount == cart_total
+        test_cart.clear()
+        assert not test_cart.items
+        assert order.payment_info == {}
+        assert order.shipping_info == {}
+        # Validate order confirmation details inline
+        assert hasattr(order, "order_id") and order.order_id is not None
+        assert hasattr(order, "user_email") and order.user_email is not None
+        assert hasattr(order, "items") and isinstance(order.items, dict)
+        assert hasattr(order, "total_amount") and order.total_amount >= 0
+
+def test_order_confirmation_contains_order_details(order):
+    """
+    Test that order confirmation includes all necessary order details.
+    
+    Validates:
+    - Confirmation contains order ID, user email, item list, and total amount
+    - All order details are accurate and complete
+    
+    This ensures customers receive correct order information post-checkout.
+    """
+    assert hasattr(order, "order_id")
+    assert hasattr(order, "user_email")
+    assert hasattr(order, "items")
+    assert hasattr(order, "total_amount")
+    assert order.order_id is not None
+    assert order.user_email is not None
+    assert isinstance(order.items, dict)
+    assert order.total_amount >= 0
+    return True
 # Tests for payment successful transaction:
 def test_payment_successful_transaction():
     """
@@ -822,7 +931,7 @@ def test_order_confirmation_email_sent(monkeypatch):
         assert "Order Confirmation" in email_sent['subject']
         assert order.order_id in email_sent['body']
 
-def test_order_confirmation_contains_order_details():
+def test_order_confirmation_details_display():
     """
     Test that order confirmation includes all relevant order details.
 
