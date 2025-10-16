@@ -197,12 +197,12 @@ def test_model_performance():
     time_function(user_authentication)
 
     # Test Payment processing performance
-    # Create payment info dictionary for cash payment (no card processing)
-    payment_info = {'payment_method': 'cash', 'card_number': None}
+    # Create payment info dictionary for credit payment (no card processing)
+    payment_info = {'payment_method': 'credit', 'card_number': 4567812345678,'expiry_date': '12/25', 'cvv': '123'}
 
     def process_payment():
         """Process a payment using the PaymentGateway"""
-        # Test the static process_payment method with cash payment
+        # Test the static process_payment method with credit payment
         # This includes the simulated processing delay
         return PaymentGateway.process_payment(payment_info)
 
@@ -347,7 +347,7 @@ def test_all_model_methods_performance():
                 user_email=user.email,
                 items={},
                 shipping_info={'name': user.name, 'address': user.address},
-                payment_info={'payment_method': 'cash', 'card_number': None},
+                payment_info={'payment_method': 'credit', 'card_number': 4567812345678, 'expiry_date': '12/25', 'cvv': '123'},
                 total_amount=25.99 * (i + 1)
             )
             user.add_order(order)
@@ -406,9 +406,9 @@ def test_bulk_payment_performance():
     system performance under load.
     """
     print("\n=== BULK PAYMENT PERFORMANCE TEST ===")
-    
-    # Test bulk cash payments
-    payment_info = {'payment_method': 'cash', 'card_number': None}
+
+    # Test bulk credit payments
+    payment_info = {'payment_method': 'credit', 'card_number': 4567812345678, 'expiry_date': '12/25', 'cvv': '123'}
     def bulk_payments():
         """Process multiple payments sequentially"""
         results = []
@@ -465,7 +465,7 @@ def test_payment_with_card_performance():
     Test performance of processing payments with card details.
     """
     print("\n=== PAYMENT WITH CARD PERFORMANCE TEST ===")
-    payment_info = {'payment_method': 'credit_card', 'card_number': '1234567812345678'}
+    payment_info = {'payment_method': 'credit_card', 'card_number': '1234567812345678', 'expiry_date': '12/25', 'cvv': '123'}
     def payment_with_card():
         PaymentGateway.process_payment(payment_info)
     profile_function(payment_with_card)
@@ -485,7 +485,7 @@ def test_order_creation_performance():
         'city': 'Testville',
         'zip_code': '12345'
     }
-    payment_info = {'payment_method': 'cash', 'card_number': None}
+    payment_info = {'payment_method': 'credit', 'card_number': 4567812345678, 'expiry_date': '12/25', 'cvv': '123'}
     def create_order():
         order = Order(
             order_id="ORD123",
