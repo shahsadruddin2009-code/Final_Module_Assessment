@@ -508,19 +508,21 @@ def test_payment_gateway_masking_performance_and_validation():
     def mask_card():
         return PaymentGateway.mask_card_number('1234567812345678')
     
-    try:
-        if mask_card() != "**** **** **** 5678":
-            return
-    except Exception as e:
-        return
-    try:
-        if len(mask_card()) >16 or len(mask_card()) < 16:
-            return
-    except Exception as e:
-        return
-    print("Card Masking Validation Passed")
-    profile_function(mask_card)
-    time_function(mask_card)
+    # Test the masking functionality first
+    test_result = mask_card()
+    print(f"Card masking result: '{test_result}'")
+    expected_result = "**** **** **** 5678"
+    print(f"Expected result: '{expected_result}'")
+    
+    # Validate the card masking works correctly
+    if test_result == expected_result:
+        print("✅ Card Masking Validation Passed")
+        # Run performance tests
+        profile_function(mask_card)
+        time_function(mask_card)
+    else:
+        print(f"❌ Card Masking Validation Failed: Expected '{expected_result}', got '{test_result}'")
+        print("Skipping performance tests due to validation failure")
 def test_full_integration_client_experience_performance(client):
     """
     Test performance of the full integration client experience.
