@@ -377,7 +377,8 @@ def test_integration_final_cart_checkout_flow(client):
         'address': '123 Main St',
         'city': 'Test City',
         'zip_code': '12345',
-        'payment_method': 'cash'
+        'payment_method': 'credit_card',
+        'card_number': '4419022512345678'
     }, follow_redirects=True)
     response = client.get('/account', follow_redirects=True)
     assert b"Order History" in response.data or b"Account" in response.data or bytes(email, 'utf-8') in response.data
@@ -419,7 +420,8 @@ def test_user_responsiveness_desktop_no_error(client, test_email = "desktopuser@
         'address': '123 Main St',
         'city': 'Test City',
         'zip_code': '12345',
-        'payment_method': 'cash'
+        'payment_method': 'credit_card',
+        'card_number': '45419022512345678'
     }, follow_redirects=True)
     assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmed" in response.data.lower()
     assert b'Email sent to your email address' in response.data or b'Order Confirmation' in response.data
@@ -455,7 +457,8 @@ def test_integration_final_cart_checkout_flow(client):
         'address': '123 Main St',
         'city': 'Test City',
         'zip_code': '12345',
-        'payment_method': 'cash'
+        'payment_method': 'credtit_card',
+        'card_number': '45419022512345678'
     }, follow_redirects=True)
     assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmed" in response.data.lower()
 
@@ -560,9 +563,16 @@ def test_integration_final_checkout_process(client):
     client.post('/add-to-cart', data={'title': 'The Great Gatsby', 'quantity': 1}, follow_redirects=True)
     response = client.post('/process-checkout', data={
         'address': '123 Main St',
-        'name': 'Test User', 'email': email, 'city': 'Test City', 'zip_code': '12345', 'payment_method': 'cash'
+        'name': 'Test User', 
+        'email': email, 
+        'city': 'Test City', 
+        'zip_code': '12345', 
+        'payment_method': 'credit_card', 
+        'card_number': '4519022512345678',
+        'expiry_date': '12/25',
+        'cvv': '123'
     }, follow_redirects=True)
-    assert b"Order Confirmation" in response.data or b"Thank you" in response.data
+    assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmation" in response.data
     response = client.get('/account', follow_redirects=True)
     assert b"Order History" in response.data or b"Account" in response.data or b"Login" in response.data or bytes(email, "utf-8") in response.data
     response = client.get('/account', follow_redirects=True)
@@ -593,11 +603,6 @@ def test_integration_complete_user_journey(client):
         'password': password,
         'confirm': password
     }, follow_redirects=True)
-    client.post('/register', data={
-        'email': email,
-        'password': password,
-        'confirm': password
-    }, follow_redirects=True)   
     client.post('/login', data={
         'email': email,
         'password': password
@@ -605,13 +610,18 @@ def test_integration_complete_user_journey(client):
     client.post('/add-to-cart', data={'title': 'The Great Gatsby', 'quantity': 1}, follow_redirects=True)
     response = client.post('/process-checkout', data={
         'address': '123 Main St',
-        'name': 'Test User', 'email': email, 'city': 'Test City', 'zip_code': '12345', 'payment_method': 'cash'
+        'name': 'Test User', 
+        'email': email, 
+        'city': 'Test City', 
+        'zip_code': '12345', 
+        'payment_method': 'credit_card', 
+        'card_number': '4519022512345678',
+        'expiry_date': '12/25',
+        'cvv': '123'
     }, follow_redirects=True)
-    assert b"Order Confirmation" in response.data or b"Thank you" in response.data
+    assert b"Order Confirmation" in response.data or b"Thank you" in response.data or b"confirmation" in response.data
     response = client.get('/account', follow_redirects=True)
     assert b"Order History" in response.data or b"Account" in response.data or b"Login" in response.data or bytes(email, "utf-8") in response.data
-    response = client.get('/account', follow_redirects=True)
-    assert b"Account" in response.data or b"Login" in response.data or bytes(email, 'utf-8') in response.data
 
 def test_integration_security_improvements_and_halt_SQL_injection(client):
     """

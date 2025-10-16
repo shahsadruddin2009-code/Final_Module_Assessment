@@ -259,8 +259,8 @@ def test_feature_customer_can_complete_checkout_process(given_a_valid_user, give
         'zip_code': '12345'
     }
     payment_info = {
-        'payment_method': 'cash',
-        'card_number': None
+        'payment_method': 'credit_card',
+        'card_number': '45419022512345678'
     }
     
     order = Order(
@@ -293,8 +293,8 @@ def test_feature_payment_processing_with_valid_payment():
     """
     # Given a customer has selected a payment method
     payment_info = {
-        'payment_method': 'cash',
-        'card_number': None
+        'payment_method': 'credit_card',
+        'card_number': '45419022512345678'
     }
     
     # When the payment is processed
@@ -320,7 +320,7 @@ def test_feature_payment_processing_with_card_payment():
     # Given a customer provides credit card information
     payment_info = {
         'payment_method': 'credit_card',
-        'card_number': '1234567812345678'
+        'card_number': '41234567812345678'
     }
     
     # When the card payment is processed
@@ -331,7 +331,7 @@ def test_feature_payment_processing_with_card_payment():
     assert 'transaction_id' in payment_result
     
     # And the card details should be masked for security
-    masked_card = PaymentGateway.mask_card_number('1234567812345678')
+    masked_card = PaymentGateway.mask_card_number('41234567812345678')
     assert masked_card == '**** **** **** 5678'
 
 def test_feature_order_confirmation_email_is_sent():
@@ -355,7 +355,7 @@ def test_feature_order_confirmation_email_is_sent():
         user_email="customer@example.com",
         items=test_cart.items,
         shipping_info={'name': 'Test Customer', 'address': '123 Main St'},
-        payment_info={'payment_method': 'cash', 'card_number': None},
+        payment_info={'payment_method': 'credit_card', 'card_number': '41234567812345678'},
         total_amount=25.99
     )
     
@@ -416,8 +416,8 @@ def test_order_creation_and_data_integrity(given_a_valid_user, given_a_cart_with
         'zip_code': '12345'
     }
     payment_info = {
-        'payment_method': 'cash',
-        'card_number': None
+        'payment_method': 'credtit_card',
+        'card_number': '41234567812345678'
     }
     
     order = Order(
@@ -456,7 +456,7 @@ def test_feature_order_confirmation_email_contains_details():
         user_email="customer@example.com",
         items=test_cart.items,
         shipping_info={'name': 'Test Customer', 'address': '123 Main St'},
-        payment_info={'payment_method': 'credit_card', 'card_number': '4111111111111111'},
+        payment_info={'payment_method': 'credit_card', 'card_number': '45234567812345678'},
         total_amount=test_cart.get_total_price()
     )
 
@@ -617,8 +617,8 @@ def test_order_timestamp_and_status_validation():
     }
     
     payment_info = {
-        'payment_method': 'cash',
-        'card_number': None
+        'payment_method': 'credit_card',
+        'card_number': '41234567812345678'
     }
     
     # When the order is created
@@ -666,8 +666,8 @@ def test_order_timestamp_within_expected_range():
     }
     
     payment_info = {
-        'payment_method': 'cash',
-        'card_number': None
+        'payment_method': 'credit_card',
+        'card_number': '41234567812345678'
     }
     
     # When the order is created

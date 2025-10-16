@@ -380,8 +380,8 @@ def update_profile():
     new_password = request.form.get('new_password')
     if new_password:
         # Validate new password strength
-        if len(new_password) < 8 or not re.search(r'[A-Za-z]', new_password) or not re.search(r'\d', new_password):
-            flash('Password must be at least 8 characters long and contain both letters and numbers', 'error')
+        if len(new_password) < 8 or not re.search(r'[A-Za-z]', new_password) or not re.search(r'\d', new_password) or not re.search(r'[!@#$%^&*(),.?":{}|<>]', new_password):
+            flash('Password must be at least 8 characters long and contain both letters and numbers and special characters', 'error')
         else:
             current_user.password = generate_password_hash(new_password)
             flash('Password updated successfully!', 'success')
